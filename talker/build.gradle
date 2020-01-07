@@ -9,12 +9,14 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'war'
 }
 
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+
 }
 
 dependencies {
@@ -26,4 +28,34 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
+
+    implementation 'org.apache.tomcat:tomcat-catalina:9.0.7'
 }
+
+def getTomcatHome() {
+    String d = System.getProperty('tomcat.home')
+    return d == null ? '' : d;
+}
+
+def cmdTomcatBat(batFile) {
+    ProcessBuilder pb = new ProcessBuilder('cmd', '/C', batFile)
+    if (getTomcatHome() != '') {
+        pb.directory(file(getTomcatHome() + '/bin'))
+        pb.start()
+    }
+}
+
+task copyWar(type: Copy, dependsOn: war) {
+    from 'build/libs'
+    include 'gradle-sample.war'
+    into getTomcatHome() + '/webapps'
+}
+
+task shutdown() {
+    cmdTomcatBat('shutdown.bat')
+}
+
+task start() {
+    cmdTomcatBat('startup.bat')
+}
+
