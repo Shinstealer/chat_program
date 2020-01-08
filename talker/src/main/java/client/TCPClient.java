@@ -15,11 +15,19 @@ public class TCPClient {
 		try {
 			socket = new Socket();
 
-			socket.connect(new InetSocketAddress(SERVER_IP ,SERVER_PORT));
+			socket.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
 		} catch (Exception e) {
 
 			e.printStackTrace();
-		}finally {
+		} finally {
+			try {
+				if (socket != null && !socket.isClosed()) {
+					socket.close();
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		}
 	}
